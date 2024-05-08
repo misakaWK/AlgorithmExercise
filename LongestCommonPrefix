@@ -29,4 +29,64 @@ public:
         return a.substr(0,index);
     }
 };
-//采用最简单的公共子前缀的构成方法，S1,S2,S3,S4,S5.....L(1,2,3,4,5)=L(L(L(1,2),3),4),5)
+//采用最简单的公共子前缀的构成方法，S1,S2,S3,S4,S5.....L(1,2,3,4,5)=L(L(L(1,2),3),4),5),这是一种横向比较
+//采用纵向比较的话，则是比较字符串数组每个字符串的同一列字符，直到出现不同或者出现更小公共前缀。
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+
+        //纵向比较
+        if(!strs.size())
+            return "";
+        int length=strs[0].size();
+        int count=strs.size();
+        for(int i=0;i<length;i++)
+        {
+            char c=strs[0][i];
+            for(int j=1;j<count;j++)
+            {
+                if(i==strs[j].size()||strs[j][i]!=c)
+                    return strs[0].substr(0,i);
+            }
+        }
+        return strs[0];
+
+    }
+};
+//因为横向比较的原因，该题还可以采用分治法的方式解决，将求公共子前缀的问题分解为左右两个子问题进行解决
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+        if(!strs.size())
+            return "";
+        else
+            {
+                return longestcommonprefix(strs,0,strs.size()-1);
+            }
+
+
+    }
+    string longestcommonprefix(vector<string>& s,int start,int end)
+    {
+        if(start==end)
+            return s[start];
+        else{
+            int mid=(start+end)/2;
+            string left=longestcommonprefix(s,start,mid);
+            string right=longestcommonprefix(s,mid+1,end);
+            return commonprefix(left,right);
+        }
+
+    }
+    string commonprefix(const string& a,const string& b)
+    {
+        int length=min(a.size(),b.size());
+        int index=0;
+        while(index<length&&a[index]==b[index])
+        {
+            ++index;
+        }
+        return a.substr(0,index);
+    }
+
+};//因为涉及递归，时间和空间消耗较大，该题数据量不大，此方法不是最佳
