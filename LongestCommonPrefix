@@ -1,0 +1,32 @@
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+
+        int len=strs.size();
+        if(!len)
+            return "";
+        string prefix=strs[0];
+        for(int i=1;i<len;i++)
+        {
+            prefix=longestCommonPrefixSub(prefix,strs[i]);
+            if(!prefix.size())
+                break;
+
+
+        }
+        return prefix;
+
+
+    }
+    string longestCommonPrefixSub(const string& a,const string& b)
+    {
+        int length=min(a.size(),b.size());
+        int index=0;
+        while(index<length&&a[index]==b[index])
+        {
+            ++index;
+        }
+        return a.substr(0,index);
+    }
+};
+//采用最简单的公共子前缀的构成方法，S1,S2,S3,S4,S5.....L(1,2,3,4,5)=L(L(L(1,2),3),4),5)
