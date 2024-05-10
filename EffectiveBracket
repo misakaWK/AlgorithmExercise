@@ -1,0 +1,34 @@
+该题只进行简单的(){}[]独立匹配，主要运用栈的思想，将待匹配括号左边装入栈中，逐步遍历待匹配符号串，遇到右半部分，进行栈顶判断，匹配成功弹出栈顶，失败返回false，为了简化判断，采用ump进行储存括号匹配的键值对关系。
+
+class Solution {
+public:
+    bool isValid(string s) {
+        unordered_map<char,char> ump={
+            {')','('},
+            {'}','{'},
+            {']','['}
+        };
+        stack<char> stk;
+        int len=s.size();
+        //可匹配成功的都是偶数串
+        if(len%2!=0)
+            return false;
+        for(char ch :s)
+        {
+            if(ump.count(ch))
+            {
+                if(stk.empty()||stk.top()!=ump[ch])
+                {
+                    return false;
+                }
+                stk.pop();
+            }
+            else
+            {
+                stk.push(ch);
+            }
+        }
+        return stk.empty();
+
+    }
+};
