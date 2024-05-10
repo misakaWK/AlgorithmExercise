@@ -1,0 +1,93 @@
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+//第一种采用递归的方法解决，合并两个有序的链表，（两个都是升序，且结果也是升序）可以取链表头比较，较小的作为最终链表的头，然后让较小的表剩余部分与另一个表继续调用合并函数，逐步递归，最终可以返回最终链表。该方法时间复杂度O(m+n)取决于这两个链表的长度，时间效率不高。
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+
+        if(list1==nullptr)
+            return list2;
+        else if(list2==nullptr)
+            return list1;
+        else
+        {
+            if(list1->val<list2->val)
+            {
+                list1->next=mergeTwoLists(list1->next,list2);
+                return list1;
+            }
+            else
+            {
+                list2->next=mergeTwoLists(list1,list2->next);
+                return list2;
+            }
+        }
+        
+    }
+};
+
+
+//采用经典的双指针判定法，维护一个pre指针逐步链接两个链表中较小的一个，留好一个最终链表的头，遍历链表中当出现有指针为null时可结束循环，最后由于是升序，可直接将剩余部分接入最终链表中。
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        ListNode*pre=nullptr;
+        ListNode*prehead=nullptr;
+        ListNode*l1=list1;
+        ListNode*l2=list2;
+        if(l1==nullptr)
+            return list2;
+        else if(l2==nullptr)
+            return list1;
+        while(l1!=nullptr&&l2!=nullptr)
+        {
+            if(l1->val<l2->val)
+            {
+                if(prehead==nullptr)
+                    {prehead=l1;
+                      pre=l1;}
+                else
+                {
+                    pre->next=l1;
+                    pre=l1;
+                    
+                }
+                l1=l1->next;
+            }
+            else
+            {
+                if(prehead==nullptr)
+                    {prehead=l2;
+                      pre=l2;}
+                else
+                {
+                    pre->next=l2;
+                    pre=l2;
+                    
+                }
+                l2=l2->next;
+            }
+        }
+
+
+
+        if(l1!=nullptr)
+        {
+            pre->next=l1;
+        }
+         if(l2!=nullptr)
+        {
+            pre->next=l2;
+        }
+        return prehead;
+
+    }
+};
