@@ -1,0 +1,95 @@
+//除了经典的递归中序遍历，也可以用栈来迭代实现
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> res;
+        stack<TreeNode*> stk;
+        while(root!=nullptr||!stk.empty())
+        {
+            while(root!=nullptr)
+            {
+                stk.push(root);
+                root=root->left;
+            }
+            root=stk.top();
+            stk.pop();
+            res.push_back(root->val);
+            root=root->right;
+        }
+        return res;
+
+    }
+};
+
+//Morris 遍历算法是另一种遍历二叉树的方法，它能将非递归的中序遍历空间复杂度降为 O(1)。
+Morris 遍历算法整体步骤如下（假设当前遍历到的节点为 x）：
+如果 x 无左孩子，先将 x 的值加入答案数组，再访问 x 的右孩子，即 x=x.rightx = x.\textit{right}x=x.right。
+如果 x 有左孩子，则找到 x 左子树上最右的节点（即左子树中序遍历的最后一个节点，x 在中序遍历中的前驱节点），我们记为 predecessor。根据 predecessor 的右孩子是否为空，进行如下操作。
+如果 predecessor 的右孩子为空，则将其右孩子指向 x，然后访问 x 的左孩子，即 x=x.left。
+如果 predecessor 的右孩子不为空，则此时其右孩子指向 x，说明我们已经遍历完 x 的左子树，我们将 predecessor 的右孩子置空，将 x 的值加入答案数组，然后访问 x 的右孩子，即 x=x.right。
+重复上述操作，直至访问完整棵树
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        TreeNode*pre=nullptr;
+        vector<int>res;
+        while(root!=nullptr)
+        {
+            if(root->left==nullptr)//如果当前结点无左子树，则直接加入结果数组，并且搜索右子树（或者通过pre进行回溯）
+            {
+                res.push_back(root->val);
+                root=root->right;
+
+            }
+            else
+            {
+                pre=root->left;
+                while(pre->right!=nullptr&&pre->right!=root)//用pre找到并记录当前root在中序遍历下的前驱结点
+                {   pre=pre->right;
+
+                }
+                if(pre->right==nullptr)//如果该前驱结点没有被搜索到，则与root建立回溯链接，然后让root开始搜索左子树
+                {
+                    pre->right=root;
+                    root=root->left;
+                }
+                else//如果已经搜索到了，则将root值加入结果数组，断开此链接，并且开始搜索回溯结点后的右子树
+                {
+                    res.push_back(root->val);
+                    pre->right=nullptr;
+                    root=root->right;
+                }
+
+            }
+        }
+        return res;
+
+    }
+};
+//该算法时间复杂度：O(n)，其中 n 为二叉树的节点个数。Morris 遍历中每个节点会被访问两次，因此总时间复杂度为 O(2n)=O(n)。
+
+空间复杂度：O(1)。
+
