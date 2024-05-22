@@ -1,0 +1,63 @@
+//对于一个升序数组去构建二叉搜索树，可以联想该二叉树的中序遍历即是该数组的升序顺序。
+但是知道中序遍历顺序无法唯一确定一棵二叉搜索树，即使加上平衡的条件也不是唯一的，通过二分递归构建仍然存在：奇数个可以唯一确定该树，偶数个数据，则要考虑mid变量选择中间靠左还是靠右的问题
+首先以每次选择中间靠左作为根节点给出递归解法：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        return create(nums,0,nums.size()-1);
+    }
+    TreeNode* create(vector<int>&nums,int left,int right)
+    {
+        if(left>right)
+            return nullptr;
+        
+        int mid=(left+right)/2;//选择中间结点的偏左进行搜索树构建
+        TreeNode*root=new TreeNode(nums[mid]);
+        root->left=create(nums,left,mid-1);
+        root->right=create(nums,mid+1,right);
+        return root;
+
+    }
+};
+//也可以任意选择左或右，只需要： int mid=(left+right+rand()%2)/2即可
+//有道二叉搜索树转化为二叉平衡树用到了同样的二分递归构造，并给出了数学证明递归构造的正确性。详情见力扣：https://leetcode.cn/problems/convert-sorted-array-to-binary-search-tree/solutions/312607/jiang-you-xu-shu-zu-zhuan-huan-wei-er-cha-sou-s-33/
+该题给出初始二叉搜索树，首先通过中序遍历拿到升序数组，再利用该升序数组进行二叉递归构造平衡树
+
+class Solution {
+public:
+    vector<int> nums;//保存该二叉搜索树中序遍历后的升序数组
+    void getorder(TreeNode*root)
+    {   if(root->left)
+            getorder(root->left);
+        nums.push_back(root->val);
+        if(root->right)
+            getorder(root->right);
+
+    }
+    TreeNode* solve(int left, int right)
+    {
+        if(left>right)
+            return nullptr;
+        int mid=(left+right+rand()%2)/2;
+        TreeNode*root=new TreeNode(nums[mid]);
+        root->left=solve(left,mid-1);
+        root->right=solve(mid+1,right);
+        return root;
+
+    }
+    TreeNode* balanceBST(TreeNode* root) {
+            getorder(root);
+            return solve(0,nums.size()-1);
+    }
+};
