@@ -1,0 +1,95 @@
+//判断一棵树是否为平衡二叉树。该树需满足的条件为，是一棵二叉排序树，其左子树，右子树也是平衡二叉树
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int getheight(TreeNode*root)//构建获取以该结点为根的高度，利用了广度优先遍历记录高度
+    {
+        if(!root)
+            return 0;
+        queue<TreeNode*> que;
+        que.push(root);
+        int h=0;
+        TreeNode*cur;
+        while(!que.empty())
+        {
+            int sz=que.size();
+            while(sz>0)
+            {   cur=que.front();que.pop();
+                if(cur->left) que.push(cur->left);
+                if(cur->right) que.push(cur->right);
+                sz-=1;
+            }
+            h++;
+        }
+        return h;
+        
+        
+
+    }
+    bool judge(TreeNode*root)//判断函数，由于力扣的题目没有严格要求，二叉排序树的构成条件，故而注释了相关的判断
+    {
+        if(!root)
+            return true;
+        //if(root->left->val>root->val||root->right->val<root->val)
+            //return false;
+        if(abs(getheight(root->left)-getheight(root->right))>1)
+            return false;
+        else
+            return judge(root->left)&&judge(root->right);
+         
+    }
+    bool isBalanced(TreeNode* root) {
+        return judge(root);
+        
+    }
+};
+
+//改良后：
+class Solution {
+public:
+    bool isBalanced(TreeNode* root) {
+        bool flag=true;
+        getans(root,flag);
+        return flag;
+    }
+    int getans(TreeNode* root,bool &flag){
+        if(root==nullptr) return 0;
+        int k1=getans(root->left,flag);
+        int k2=getans(root->right,flag);
+        if(abs(k1-k2)>1) flag=false;
+        return max(k1,k2)+1;//通过递归（即深度搜索）获取子树高度，并且利用flag融合进判断里
+    }
+};
+//由于一开始的自顶向下的遍历方法存在重复调用getheight函数的情况，耗时较高，故可以采用自底向上的方式进行遍历
+
+class Solution {
+public:
+    int height(TreeNode* root) {
+        if (root == NULL) {
+            return 0;
+        }
+//自底向上有点类似后序遍历，先判断该结点左右子树是否平衡，再判断以该结点为根的子树是否平衡，该函数最终返回该树的高度，不平衡则返回-1
+        int leftHeight = height(root->left);
+        int rightHeight = height(root->right);
+        if (leftHeight == -1 || rightHeight == -1 || abs(leftHeight - rightHeight) > 1) {
+            return -1;
+        } else {
+            return max(leftHeight, rightHeight) + 1;
+        }
+    }
+
+    bool isBalanced(TreeNode* root) {
+        return height(root) >= 0;
+    }
+};
