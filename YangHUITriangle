@@ -1,0 +1,42 @@
+//根据输入的正整数来构造相应行数的杨辉三角
+c++数据结构采用vector<vector<int>>
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        
+        vector<vector<int>> res(numRows);//构建同行数的二维数组
+        for(int i=0;i<numRows;i++)
+        {
+            res[i].resize(i+1);/对于每行进行重设置大小（即设置列数），比当前行数多一
+            res[i][0]=res[i][i]=1;//每行首个和末尾为一
+            for(int j=1;j<i;j++)
+            {
+                res[i][j]=res[i-1][j-1]+res[i-1][j];//每行剩余元素等于左右肩元素之和
+            }
+        }
+        return res;
+
+    }
+};
+
+//也可采用动态规划
+class Solution {
+public:
+vector<vector<int>> res;
+vector<int> ans;
+int f[35][35];
+    vector<vector<int>> generate(int numRows) {
+        f[0][0]=1;
+        res.push_back({1});
+        for(int i=1;i<numRows;i++){
+            for(int j=0;j<=i;j++){
+                if(j==0||j==i)f[i][j]=1;
+                else f[i][j]=f[i-1][j]+f[i-1][j-1];
+                ans.push_back(f[i][j]);
+            }
+        res.push_back(ans);
+        ans.clear();
+        }return res;
+        
+    }
+};
