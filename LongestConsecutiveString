@@ -1,0 +1,58 @@
+//求解一个数组最长连续序列，可以利用哈希表来存储使得时间复杂度从O（n**2）降到O（n）
+/*整体思想是：考虑遍历一次整个数组，并且对于数组的每个数x考虑作为这个连续序列的开头，由此试着寻找x+1,x+2,x+3.....,但是为了确保不进行重复的访问寻找，选择某个x作为序列开头需要拥有剪切条件
+即如果对于哈希表中的x，x-1也存在于表内，则证明x无法作为最长连续序列的开头，无需进行向前寻找。
+代码：
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+        unordered_set<int> num_set;
+        for (const int& num : nums) {
+            num_set.insert(num);
+        }
+
+        int longestStreak = 0;
+
+        for (const int& num : num_set) {
+            if (!num_set.count(num - 1)) {
+                int currentNum = num;
+                int currentStreak = 1;
+
+                while (num_set.count(currentNum + 1)) {
+                    currentNum += 1;
+                    currentStreak += 1;
+                }
+
+                longestStreak = max(longestStreak, currentStreak);
+            }
+        }
+
+        return longestStreak;           
+    }
+};
+//也可以进行逆序寻找，每次寻找到连续序列的最大值
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+        if(nums.size()==0)
+            return 0;
+        set<int> ss;
+        for(int num:nums)
+        {
+            ss.insert(num);
+        }
+        int res=0;
+        for(int num:nums)
+        {   if(!ss.count(num+1))//如果num+1存在则证明num不是存在连续序列的最大值，反之是最大值,(这是一种逆序性判断)
+            {
+                int max=0;
+                while(ss.count(num--)) max++;
+
+                res=std::max(res,max);
+            }
+
+        }
+        return res;
+        
+    }
+};
+
