@@ -1,0 +1,90 @@
+//接雨水的问题
+//给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+主要要确定当前位置的左右边界，接雨水深度取决于左右边界较小的一边
+1.动态规划法：
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int res=0;
+        int len=height.size();
+        int left_max[len],right_max[len];
+        int temp=0;
+        //构建左边界尽量最大数组
+        for(int i=0;i<len;i++)
+        {
+            temp=max(temp,height[i]);
+            left_max[i]=temp;
+        }
+        temp=0;
+        //构建右边界尽量最大数组
+        for(int j=len-1;j>=0;j--)
+        {
+            temp=max(temp,height[j]);
+            right_max[j]=temp;
+        }
+        int curH,minH;
+        for(int i=0;i<len;i++)
+        {
+            minH=min(left_max[i],right_max[i]);
+            curH=minH-height[i];
+            res+=curH;
+        }
+        return res;
+
+
+    }
+};
+
+
+
+2.双指针法：
+//基于动态规划法，缩减使用的空间，维护left，right两个指针和leftMax，rightMax两个变量，因为低洼存水条件在于两个边界中较小的，和该边界和当前高度的差值
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int ans = 0;
+        int left = 0, right = height.size() - 1;//初始让两个指针在左右两边
+        int leftMax = 0, rightMax = 0;
+        //循环每次都选择一边作为可能成为的一个相应边界
+        while(left<right){
+            leftMax=max(leftMax,height[left]);
+            rightMax=max(rightMax,height[right]);
+            if(height[left]<height[right]){//height[right]作为可能的右边界，左指针右移，并且将低洼可存的水加入结果
+                ans+=leftMax-height[left];
+                left++;
+            }else{//height[left]作为可能的左边界，右指针左移，并且将低洼可存的水加入结果
+                ans+=rightMax-height[right];
+                right--;
+            }
+        }
+        return ans;
+    }
+};
+3.单调栈法：
+//通过一次遍历，利用单调递减栈（栈底到栈顶是递减的）存储可能的左边界下标
+
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int ans = 0;
+        stack<int> stk;
+        int n = height.size();
+        for (int i = 0; i < n; ++i) {
+        //内循环，栈不为空且当前高度大于栈顶存储高度，说明形成了一个低洼，因为stk.pop()后的newtop=stk.top()这个newtop高度由于递减栈的原因大于height[stk.top()],于是newtop高度和height[i]构成左右边界，可以计算一次积水面积
+            while (!stk.empty() && height[i] > height[stk.top()]) {
+                int top = stk.top();
+                stk.pop();
+                if (stk.empty()) {
+                    break;
+                }
+                int left = stk.top();
+                int currWidth = i - left - 1;
+                int currHeight = min(height[left], height[i]) - height[top];
+                ans += currWidth * currHeight;
+            }
+            stk.push(i);
+        }
+        return ans;
+    }
+};
+
