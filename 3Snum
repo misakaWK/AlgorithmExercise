@@ -1,0 +1,39 @@
+//求一个数组中满足三数之和为0的不重复三元组
+/*首先想到的就是三循环暴力枚举，但是很明显无法做到去重，而且时间复杂度为O(n**3)
+为了去重可以将原数组进行升序排序，我们尝试获得符合条件的升序三元组(a,b,c)，即a<b<c，而且对于重复相等的数字只枚举一次，后续要跳过。
+接下来是降低时间复杂度，对于b的指针在枚举的过程中，b是增大的，a固定的情况下，c的需求下降，由于默认升序的原因，我们可以让c的指针从右往左遍历，这样c的枚举就和b是并列关系了
+在这个过程中要保持b<c，如果b和c重合时还没有找到符合条件的，则后续不用再枚举可跳出第二重循环，因为b c大小关系不满足，且后续不可能存在符合条件的三元组*/
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        int len=nums.size();
+        sort(nums.begin(),nums.end());
+        vector<vector<int>> res;
+        //要求三元组(a,b,c),首先枚举a,并在后续获取b c时降低枚举时间复杂度
+        for(int i=0;i<len;i++)
+        {   //获取a<b<c的单调组，可以去重
+            if(i>0&&nums[i]==nums[i-1])
+                continue;
+            int k=len-1;//对于c的从右往左的指针
+            int target=0-nums[i];
+            //枚举b
+            for(int j=i+1;j<len;j++)
+            {
+                if(j>i+1&&nums[j]==nums[j-1])
+                    continue;
+                
+                //确保b的指针在c的指针左边
+                while(j<k&&nums[j]+nums[k]>target)
+                    k--;
+                if(j==k)
+                    break;
+                if(nums[j]+nums[k]==target)
+                {
+                    res.push_back({nums[i],nums[j],nums[k]});
+                }
+            }
+        }
+        return res;
+
+    }
+};
